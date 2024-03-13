@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.*;
+import java.time.*;
 
 public class SequentialSearch {
 	
@@ -36,12 +37,17 @@ public class SequentialSearch {
             Scanner sc = new Scanner(System.in);
             System.out.println("Enter the word to search:");
             String searchWord = sc.nextLine();
+            LocalTime start = LocalTime.now();
             int index = linearSearch(wordsArray, searchWord);
             if (index != -1) {
                 System.out.println("Word found at index: " + index);
             } else {
                 System.out.println("Word not found");
             }
+            LocalTime end = LocalTime.now();
+            Duration time =  Duration.between(start, end);
+            System.out.print(time);
+            
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
