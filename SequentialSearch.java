@@ -8,10 +8,8 @@ import java.util.*;
 import java.time.*;
 
 public class SequentialSearch {
-	
-	
-	
-	public static void main(String[] args) {
+
+    public static void main(String[] args) {
         String fileName = "C://words.txt";
         List<String> wordList = new ArrayList<>();
 
@@ -37,28 +35,29 @@ public class SequentialSearch {
             Scanner sc = new Scanner(System.in);
             System.out.println("Enter the word to search:");
             String searchWord = sc.nextLine();
-            LocalTime start = LocalTime.now();
+            long start = System.nanoTime();
             int index = linearSearch(wordsArray, searchWord);
+            long end = System.nanoTime();
+            long nanos = end - start;
+            System.out.println("Time taken: " + nanos + " nanoseconds");
+
             if (index != -1) {
                 System.out.println("Word found at index: " + index);
             } else {
                 System.out.println("Word not found");
             }
-            LocalTime end = LocalTime.now();
-            Duration time =  Duration.between(start, end);
-            System.out.print(time);
-            
+
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
     }
-	
-	public static int linearSearch(String[] array, String target) {
+
+    public static int linearSearch(String[] array, String target) {
         for (int i = 0; i < array.length; i++) {
             if (array[i].equals(target)) { // Use equals() to compare strings
                 return i; // Return the index of the target element if found
             }
         }
         return -1;
-	}
+    }
 }
