@@ -4,7 +4,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.time.*;
 
-public class HashingSearch {
+public class HashingSearchRandom {
 
     public static void main(String[] args) {
         String fileName = "C:/words.txt";
