@@ -40,12 +40,11 @@ public class BinarySearch {
             System.out.println("Enter the word to search:");
             String searchWord = sc.nextLine();
 
-            LocalTime start = LocalTime.now();
+            long start = System.nanoTime();
             int index = binarySearch(wordsArray, searchWord);
-            LocalTime end = LocalTime.now();
-            Duration time = Duration.between(start, end);
-            long micros = time.toNanos() / 1000;
-            System.out.println("Time taken: " + micros + " microseconds");
+            long end = System.nanoTime();
+            long nanos = end - start;
+            System.out.println("Time taken: " + nanos + " nanoseconds");
 
             if (index != -1) {
                 System.out.println("Word found at index: " + index);
