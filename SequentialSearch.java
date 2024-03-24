@@ -8,53 +8,71 @@ public class SequentialSearch {
 
     public static void main(String[] args) {
         String fileName = "C:/words.txt"; // Use forward slashes for portability (/ instead of \)
-        List<String> wordList = new ArrayList<>();
-        LinkedList<String> wordLinkedList = new LinkedList<>();
-        
-        
-//        //Array
-//        try {
-//            wordList = Files.readAllLines(Paths.get(fileName)); // Read lines directly into the list
-//        } catch (IOException e) {
-//            System.err.println("Error reading file: " + e.getMessage());
-//            return; // Exit program on error
-//        }
-        
-        //LinkedList
+        List<String> wordList = readFileToList(fileName);
+
+        if (wordList == null) {
+            System.err.println("Error reading file.");
+            return;
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the number of words to search (max: " + wordList.size() + "):");
+        int numWordsToSearch;
         try {
-            List<String> lines = Files.readAllLines(Paths.get(fileName));
-            for (String line : lines) {
-                // Assuming words are separated by spaces
-                String[] words = line.split("\\s+"); // Escape the backslash for regex
-                for (String word : words) {
-                    wordLinkedList.add(word); // Add word to the linked list
-                }
+            numWordsToSearch = Integer.parseInt(scanner.nextLine());
+            if (numWordsToSearch > wordList.size()) {
+                throw new IllegalArgumentException("Number of random words cannot exceed list size.");
             }
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid input. Please enter a number.");
+            return;
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
+
+        String[] wordsToSearch = generateRandomWords(wordList, numWordsToSearch).toArray(new String[0]); // Convert list to array
+
+        System.out.println("Searching for these words:");
+        for (String word : wordsToSearch) {
+            System.out.println(word);
+        }
+
+        System.out.println("\nSearch results:");
+        for (int i = 0; i < wordsToSearch.length; i++) {
+            long startTime = System.nanoTime();
+            int index = linearSearch(wordList, wordsToSearch[i].toLowerCase()); // Make search case-insensitive
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            if (index != -1) {
+                System.out.println("Word '" + wordsToSearch[i] + "' found at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
+            } else {
+                System.out.println("Word '" + wordsToSearch[i] + "' not found");
+            }
+        }
+    }
+
+    private static List<String> readFileToList(String fileName) {
+        try {
+            return Files.readAllLines(Paths.get(fileName));
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
-            return; // Exit program on error
+            return null;
         }
-        
-        Scanner scanner = new Scanner(System.in); // Use a descriptive variable name
-        System.out.println("Enter the word to search:");
-        String searchWord = scanner.nextLine().toLowerCase(); // Make search case-insensitive
-
-        long start = System.nanoTime();
-        int index = linearSearch(wordLinkedList, searchWord);
-        long end = System.nanoTime();
-        long nanos = end - start;
-        System.out.println("Time taken: " + nanos + " nanoseconds");
-
-        if (index != -1) {
-            System.out.println("Word found at index: " + index);
-        } else {
-            System.out.println("Word not found");
-        }
-
-//        System.out.println("Search time: " + timeTaken); // Print formatted time
     }
-    
-    
+
+    private static List<String> generateRandomWords(List<String> wordList, int numWords) {
+        List<String> randomWords = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < numWords; i++) {
+            int randomIndex = random.nextInt(wordList.size()); // Generate random index within list bounds
+            randomWords.add(wordList.get(randomIndex));
+        }
+
+        return randomWords;
+    }
 
     public static int linearSearch(List<String> list, String target) {
         for (int i = 0; i < list.size(); i++) {
