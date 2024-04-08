@@ -8,19 +8,20 @@ public class SequentialSearch {
 
     public static void main(String[] args) {
         String fileName = "C:/words.txt"; // Use forward slashes for portability (/ instead of \)
-        List<String> wordList = readFileToList(fileName);
+        List<String> wordArrayList = readFileToArrayList(fileName);
+        List<String> wordLinkedList = readFileToLinkedList(fileName);
 
-        if (wordList == null) {
+        if (wordArrayList == null || wordLinkedList == null) {
             System.err.println("Error reading file.");
             return;
         }
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the number of words to search (max: " + wordList.size() + "):");
+        System.out.println("Enter the number of words to search (max: " + wordArrayList.size() + "):");
         int numWordsToSearch;
         try {
             numWordsToSearch = Integer.parseInt(scanner.nextLine());
-            if (numWordsToSearch > wordList.size()) {
+            if (numWordsToSearch > wordArrayList.size()) {
                 throw new IllegalArgumentException("Number of random words cannot exceed list size.");
             }
         } catch (NumberFormatException e) {
@@ -31,17 +32,18 @@ public class SequentialSearch {
             return;
         }
 
-        String[] wordsToSearch = generateRandomWords(wordList, numWordsToSearch).toArray(new String[0]); // Convert list to array
+        String[] wordsToSearch = generateRandomWords(wordArrayList, numWordsToSearch).toArray(new String[0]); // Convert list to array
 
         System.out.println("Searching for these words:");
         for (String word : wordsToSearch) {
             System.out.println(word);
         }
 
-        System.out.println("\nSearch results:");
+        System.out.println("\nArrayList search results:");
+        long atotal = 0;
         for (int i = 0; i < wordsToSearch.length; i++) {
             long startTime = System.nanoTime();
-            int index = linearSearch(wordList, wordsToSearch[i].toLowerCase()); // Make search case-insensitive
+            int index = linearSearch(wordArrayList, wordsToSearch[i].toLowerCase()); // Make search case-insensitive
             long endTime = System.nanoTime();
             long nanos = endTime - startTime;
 
@@ -50,16 +52,72 @@ public class SequentialSearch {
             } else {
                 System.out.println("Word '" + wordsToSearch[i] + "' not found");
             }
+            atotal+=nanos;
         }
+        System.out.println("Total time used to search all words: " + atotal);
+        System.out.println("Average time used to search all words: " + atotal/numWordsToSearch);
+        
+        
+        System.out.println("\nLinkedList search results:");
+        long btotal = 0;
+        for (int i = 0; i < wordsToSearch.length; i++) {
+            long startTime = System.nanoTime();
+            int index = linearSearch(wordLinkedList, wordsToSearch[i].toLowerCase()); // Make search case-insensitive
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            if (index != -1) {
+                System.out.println("Word '" + wordsToSearch[i] + "' found at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
+            } else {
+                System.out.println("Word '" + wordsToSearch[i] + "' not found");
+            }
+            btotal+=nanos;
+        }
+        System.out.println("Total time used to search all words: " + btotal);
+        System.out.println("Average time used to search all words: " + btotal/numWordsToSearch);
+        
+        
+        
     }
 
-    private static List<String> readFileToList(String fileName) {
+    public static ArrayList<String> readFileToArrayList(String fileName) {
+        ArrayList<String> wordList = new ArrayList<>();
+
         try {
-            return Files.readAllLines(Paths.get(fileName));
+            List<String> lines = Files.readAllLines(Paths.get(fileName));
+            for (String line : lines) {
+                // Assuming words are separated by spaces
+                String[] words = line.split("\\s+"); // Escape the backslash for regex
+                for (String word : words) {
+                    wordList.add(word); // Add word to the ArrayList
+                }
+            }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
-            return null;
+            return null; // Return null on error
         }
+
+        return wordList;
+    }
+    
+    public static LinkedList<String> readFileToLinkedList(String fileName) {
+        LinkedList<String> wordLinkedList = new LinkedList<>();
+
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(fileName));
+            for (String line : lines) {
+                // Assuming words are separated by spaces
+                String[] words = line.split("\\s+"); // Escape the backslash for regex
+                for (String word : words) {
+                    wordLinkedList.add(word); // Add word to the linked list
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            return null; // Return null on error
+        }
+
+        return wordLinkedList;
     }
 
     private static List<String> generateRandomWords(List<String> wordList, int numWords) {
