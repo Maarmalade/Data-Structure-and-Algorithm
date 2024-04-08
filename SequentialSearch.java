@@ -41,10 +41,9 @@ public class SequentialSearch {
 
         System.out.println("\nArrayList search results:");
         long atotal = 0;
-        int lastFoundIndex = -1;
         for (int i = 0; i < wordsToSearch.length; i++) {
             long startTime = System.nanoTime();
-            int index = linearSearch(wordArrayList, wordsToSearch[i].toLowerCase(), lastFoundIndex); // Make search case-insensitive
+            int index = linearSearchArray(wordArrayList, wordsToSearch[i].toLowerCase()); // Make search case-insensitive
             long endTime = System.nanoTime();
             long nanos = endTime - startTime;
 
@@ -61,7 +60,7 @@ public class SequentialSearch {
         
         System.out.println("\nLinkedList search results:");
         long btotal = 0;
-        lastFoundIndex = -1;
+        int lastFoundIndex = -1;
         for (int i = 0; i < wordsToSearch.length; i++) {
             long startTime = System.nanoTime();
             int index = linearSearch(wordLinkedList, wordsToSearch[i].toLowerCase(), lastFoundIndex);
@@ -81,9 +80,8 @@ public class SequentialSearch {
         System.out.println("Enter word to search: ");
         String search = scanner.nextLine();
         
-        lastFoundIndex = -1;
         long startTime = System.nanoTime();
-        int index = linearSearch(wordArrayList, search.toLowerCase(),lastFoundIndex); // Make search case-insensitive
+        int index = linearSearchArray(wordArrayList, search.toLowerCase()); // Make search case-insensitive
         long endTime = System.nanoTime();
         long nanos = endTime - startTime;
         System.out.println("Time used in ArrayList : " + nanos);
@@ -149,7 +147,15 @@ public class SequentialSearch {
 
         return randomWords;
     }
-
+    
+    public static int linearSearchArray(List<String> list, String target) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).toLowerCase().equals(target)) { // Consistent case-insensitive search
+                return i;
+            }
+        }
+        return -1;
+    }
     
     public static int linearSearch(List<String> wordlist, String target, int lastFoundIndex) {
         if (lastFoundIndex >= 0 && lastFoundIndex < wordlist.size()) {
@@ -176,4 +182,3 @@ public class SequentialSearch {
     }
     
 }
-
