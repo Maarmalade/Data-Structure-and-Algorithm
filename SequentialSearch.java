@@ -10,8 +10,11 @@ public class SequentialSearch {
         String fileName = "C:/words.txt"; // Use forward slashes for portability (/ instead of \)
         List<String> wordArrayList = readFileToArrayList(fileName);
         List<String> wordLinkedList = readFileToLinkedList(fileName);
+        String shuffleFileName = "C:/shuffleWords.txt"; // Use forward slashes for portability (/ instead of \)
+        List<String> shuffleWordArrayList = readFileToArrayList(shuffleFileName);
+        List<String> shuffleWordLinkedList = readFileToLinkedList(shuffleFileName);
 
-        if (wordArrayList == null || wordLinkedList == null) {
+        if (wordArrayList == null || wordLinkedList == null || shuffleWordArrayList == null || shuffleWordLinkedList == null) {
             System.err.println("Error reading file.");
             return;
         }
@@ -36,14 +39,14 @@ public class SequentialSearch {
 
         System.out.println("Searching for these words:");
         for (String word : wordsToSearch) {
-            System.out.println(word);
+            System.out.print(word + " ");
         }
 
-        System.out.println("\nArrayList search results:");
+        System.out.println("\n\nArrayList search results:");
         long atotal = 0;
         for (int i = 0; i < wordsToSearch.length; i++) {
             long startTime = System.nanoTime();
-            int index = linearSearchArray(wordArrayList, wordsToSearch[i].toLowerCase()); // Make search case-insensitive
+            int index = linearSearch(wordArrayList, wordsToSearch[i].toLowerCase()); // Make search case-insensitive
             long endTime = System.nanoTime();
             long nanos = endTime - startTime;
 
@@ -63,12 +66,12 @@ public class SequentialSearch {
         int lastFoundIndex = -1;
         for (int i = 0; i < wordsToSearch.length; i++) {
             long startTime = System.nanoTime();
-            int index = linearSearch(wordLinkedList, wordsToSearch[i].toLowerCase(), lastFoundIndex);
+            int index = ModifiedLinearSearch(wordLinkedList, wordsToSearch[i].toLowerCase(), lastFoundIndex);
             long endTime = System.nanoTime();
             long nanos = endTime - startTime;
 
             if (index != -1) {
-                //System.out.println("Word '" + wordsToSearch[i] + "' found at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
+                //System.out.println("Word '" + wordsToSearch[i] + "' found at index: " + index + " (Time taken: " + nanos2 + " nanoseconds)");
             } else {
                 //System.out.println("Word '" + wordsToSearch[i] + "' not found");
             }
@@ -77,23 +80,63 @@ public class SequentialSearch {
         System.out.println("Total time used to search all words: " + btotal);
         System.out.println("Average time used to search all words: " + btotal/numWordsToSearch);
         
+        
+        System.out.println("\nShuffled ArrayList search results:");
+        long ctotal = 0;
+        for (int i = 0; i < wordsToSearch.length; i++) {
+            long startTime = System.nanoTime();
+            int index = linearSearch(wordArrayList, wordsToSearch[i].toLowerCase()); // Make search case-insensitive
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            if (index != -1) {
+                //System.out.println("Word '" + wordsToSearch[i] + "' found at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
+            } else {
+                //System.out.println("Word '" + wordsToSearch[i] + "' not found");
+            }
+            ctotal+=nanos;
+        }
+        System.out.println("Total time used to search all words: " + ctotal);
+        System.out.println("Average time used to search all words: " + ctotal/numWordsToSearch);
+        
+        
+        System.out.println("\nShuffled LinkedList search results:");
+        long dtotal = 0;
+        lastFoundIndex = -1;
+        for (int i = 0; i < wordsToSearch.length; i++) {
+            long startTime = System.nanoTime();
+            int index = ModifiedLinearSearch(wordLinkedList, wordsToSearch[i].toLowerCase(), lastFoundIndex);
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            if (index != -1) {
+                //System.out.println("Word '" + wordsToSearch[i] + "' found at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
+            } else {
+                //System.out.println("Word '" + wordsToSearch[i] + "' not found");
+            }
+            dtotal+=nanos;
+        }
+        System.out.println("Total time used to search all words: " + dtotal);
+        System.out.println("Average time used to search all words: " + dtotal/numWordsToSearch);
+        
+        
+
         System.out.println("Enter word to search: ");
         String search = scanner.nextLine();
         
         long startTime = System.nanoTime();
-        int index = linearSearchArray(wordArrayList, search.toLowerCase()); // Make search case-insensitive
+        int index = linearSearch(wordArrayList, search.toLowerCase()); // Make search case-insensitive
         long endTime = System.nanoTime();
         long nanos = endTime - startTime;
         System.out.println("Time used in ArrayList : " + nanos);
         
         lastFoundIndex = -1;
         long startTime2 = System.nanoTime();
-        int index2 = linearSearch(wordLinkedList, search.toLowerCase(), lastFoundIndex); // Make search case-insensitive
+        int index2 = ModifiedLinearSearch(wordLinkedList, search.toLowerCase(), lastFoundIndex); // Make search case-insensitive
         long endTime2 = System.nanoTime();
         long nanos2 = endTime2 - startTime2;
         System.out.println("Time used in LinkedList: " + nanos2);
-        
-        
+
     }
 
     public static ArrayList<String> readFileToArrayList(String fileName) {
@@ -148,22 +191,22 @@ public class SequentialSearch {
         return randomWords;
     }
     
-    public static int linearSearchArray(List<String> list, String target) {
+    public static int linearSearch(List<String> list, String target) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).toLowerCase().equals(target)) { // Consistent case-insensitive search
                 return i;
             }
         }
-        return -1;
+        throw new NoSuchElementException("Target word \"" + target + "\" not found in the list.");
     }
     
-    public static int linearSearch(List<String> wordlist, String target, int lastFoundIndex) {
+    public static int ModifiedLinearSearch(List<String> wordlist, String target, int lastFoundIndex) {
         if (lastFoundIndex >= 0 && lastFoundIndex < wordlist.size()) {
             // Start search from the index after the last found word (potentially faster for clustered data)
             ListIterator<String> iterator = wordlist.listIterator(lastFoundIndex + 1);
             while (iterator.hasNext()) {
                 String word = iterator.next();
-                if (word.equals(target)) {
+                if (word.toLowerCase().equals(target)) {
                     return iterator.previousIndex(); // Return the actual index (previous from iterator)
                 }
             }
@@ -173,12 +216,14 @@ public class SequentialSearch {
         ListIterator<String> iterator = wordlist.listIterator();
         while (iterator.hasNext()) {
             String word = iterator.next();
-            if (word.equals(target)) {
+            if (word.toLowerCase().equals(target)) {
                 return iterator.previousIndex();
             }
         }
 
-        return -1; // Not found
+        throw new NoSuchElementException("Target word \"" + target + "\" not found in the list."); // Not found
     }
+   
     
 }
+
