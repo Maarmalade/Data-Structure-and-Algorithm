@@ -6,10 +6,11 @@ import java.util.*;
 public class SearchAlgorithmComparison {
 
     public static void main(String[] args) {
-        String fileName = "C:/words.txt";
-        List<String> wordList = readFileToList(fileName);
+    	String fileName = "C:/words.txt"; // Use forward slashes for portability (/ instead of \)
+        List<String> wordArrayList = readFileToArrayList(fileName);
+        List<String> wordLinkedList = readFileToLinkedList(fileName);
 
-        if (wordList == null) {
+        if (wordArrayList == null || wordLinkedList == null) {
             System.err.println("Error reading file.");
             return;
         }
@@ -20,44 +21,43 @@ public class SearchAlgorithmComparison {
 
         // Binary Search
         long startBinary = System.nanoTime();
-        int indexBinary = binarySearch(wordList.toArray(new String[0]), searchWord);
+        int indexBinary = binarySearch(wordArrayList.toArray(new String[0]), searchWord);
         long endBinary = System.nanoTime();
         long nanosBinary = endBinary - startBinary;
-
-        // Modified Binary Search
-        long startModifiedBinary = System.nanoTime();
-        int indexModifiedBinary = modifiedBinarySearch(wordList.toArray(new String[0]), searchWord);
-        long endModifiedBinary = System.nanoTime();
-        long nanosModifiedBinary = endModifiedBinary - startModifiedBinary;
-
-        // Sequential ArrayList Search
-        long startSequentialArrayList = System.nanoTime();
-        int indexSequentialArrayList = linearSearch(wordList, searchWord);
-        long endSequentialArrayList = System.nanoTime();
-        long nanosSequentialArrayList = endSequentialArrayList - startSequentialArrayList;
-
-        // Modified Sequential LinkedList Search
-        LinkedList<String> wordLinkedList = new LinkedList<>(wordList);
-        long startModifiedSequentialLinkedList = System.nanoTime();
-        int indexModifiedSequentialLinkedList = ModifiedLinearSearch(wordLinkedList, searchWord, -1);
-        long endModifiedSequentialLinkedList = System.nanoTime();
-        long nanosModifiedSequentialLinkedList = endModifiedSequentialLinkedList - startModifiedSequentialLinkedList;
 
         // Binary Search with LinkedList
         long startBinaryLinkedList = System.nanoTime();
         int indexBinaryLinkedList = binarySearchLinkedList(wordLinkedList, searchWord);
         long endBinaryLinkedList = System.nanoTime();
         long nanosBinaryLinkedList = endBinaryLinkedList - startBinaryLinkedList;
+        
+        // Modified Binary Search
+        long startModifiedBinary = System.nanoTime();
+        int indexModifiedBinary = modifiedBinarySearch(wordArrayList.toArray(new String[0]), searchWord);
+        long endModifiedBinary = System.nanoTime();
+        long nanosModifiedBinary = endModifiedBinary - startModifiedBinary;
+        
+        // Sequential ArrayList Search
+        long startSequentialArrayList = System.nanoTime();
+        int indexSequentialArrayList = linearSearch(wordArrayList, searchWord);
+        long endSequentialArrayList = System.nanoTime();
+        long nanosSequentialArrayList = endSequentialArrayList - startSequentialArrayList;
+
+        // Modified Sequential LinkedList Search
+        long startModifiedSequentialLinkedList = System.nanoTime();
+        int indexModifiedSequentialLinkedList = ModifiedLinearSearch(wordLinkedList, searchWord, -1);
+        long endModifiedSequentialLinkedList = System.nanoTime();
+        long nanosModifiedSequentialLinkedList = endModifiedSequentialLinkedList - startModifiedSequentialLinkedList;
 
         // Hashing Search with 50,000 elements
-        HashMap<String, Integer> wordMap50000 = createWordHashMap(wordList, 50000);
+        HashMap<String, Integer> wordMap50000 = createWordHashMap(wordArrayList, 50000);
         long startHashing50000 = System.nanoTime();
         Integer indexHashing50000 = wordMap50000.get(searchWord);
         long endHashing50000 = System.nanoTime();
         long nanosHashing50000 = endHashing50000 - startHashing50000;
 
         // Hashing Search with 500,000 elements
-        HashMap<String, Integer> wordMap500000 = createWordHashMap(wordList, 500000);
+        HashMap<String, Integer> wordMap500000 = createWordHashMap(wordArrayList, 500000);
         long startHashing500000 = System.nanoTime();
         Integer indexHashing500000 = wordMap500000.get(searchWord);
         long endHashing500000 = System.nanoTime();
@@ -113,6 +113,97 @@ public class SearchAlgorithmComparison {
         } else {
             System.out.println("Word not found using Hashing Search with 500,000 hash table capacity");
         }
+        
+
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n\n\nEnter the number of words to search (max: " + wordArrayList.size() + "):");
+        int numWordsToSearch;
+        try {
+            numWordsToSearch = Integer.parseInt(sc.nextLine());
+            if (numWordsToSearch > wordArrayList.size()) {
+                throw new IllegalArgumentException("Number of random words cannot exceed list size.");
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid input. Please enter a number.");
+            return;
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
+
+        String[] wordsToSearch = generateRandomWords(wordArrayList, numWordsToSearch).toArray(new String[0]); // Convert list to array
+
+        System.out.println("\nArrayList sequential search results:");
+        long total = 0;
+        for (int i = 0; i < wordsToSearch.length; i++) {
+            long startTime = System.nanoTime();
+            int index = linearSearch(wordArrayList, wordsToSearch[i].toLowerCase()); // Make search case-insensitive
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            total+=nanos;
+        }
+        System.out.println("Total time used to search all words: " + total);
+        System.out.println("Average time used to search all words: " + total/numWordsToSearch);
+        
+        
+        System.out.println("\nLinkedList sequential search results:");
+        total = 0;
+        int lastFoundIndex = -1;
+        for (int i = 0; i < wordsToSearch.length; i++) {
+            long startTime = System.nanoTime();
+            int index = ModifiedLinearSearch(wordLinkedList, wordsToSearch[i].toLowerCase(), lastFoundIndex);
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            total+=nanos;
+        }
+        System.out.println("Total time used to search all words: " + total);
+        System.out.println("Average time used to search all words: " + total/numWordsToSearch);
+        
+        
+        System.out.println("\n\nArrayList binary search results:");
+        total = 0;
+        for (int i = 0; i < wordsToSearch.length; i++) {
+            long startTime = System.nanoTime();
+            indexBinary = binarySearch(wordArrayList.toArray(new String[0]), wordsToSearch[i].toLowerCase());
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            total+=nanos;
+        }
+        System.out.println("Total time used to search all words: " + total);
+        System.out.println("Average time used to search all words: " + total/numWordsToSearch);
+        
+        
+        System.out.println("\n\nArrayList modified binary search results:");
+        total = 0;
+        for (int i = 0; i < wordsToSearch.length; i++) {
+            long startTime = System.nanoTime();
+            indexBinary = modifiedBinarySearch(wordArrayList.toArray(new String[0]), wordsToSearch[i].toLowerCase());
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            total+=nanos;
+        }
+        System.out.println("Total time used to search all words: " + total);
+        System.out.println("Average time used to search all words: " + total/numWordsToSearch);
+        
+        
+        System.out.println("\n\nLinkedList binary search results:");
+        total = 0;
+        for (int i = 0; i < wordsToSearch.length; i++) {
+            long startTime = System.nanoTime();
+            indexBinary = binarySearchLinkedList(wordLinkedList, wordsToSearch[i].toLowerCase());
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            total+=nanos;
+        }
+        System.out.println("Total time used to search all words: " + total);
+        System.out.println("Average time used to search all words: " + total/numWordsToSearch);
+        
     }
 
     public static List<String> readFileToList(String fileName) {
@@ -131,6 +222,58 @@ public class SearchAlgorithmComparison {
         }
 
         return wordList;
+    }
+    
+    public static ArrayList<String> readFileToArrayList(String fileName) {
+        ArrayList<String> wordArrayList = new ArrayList<>();
+
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(fileName));
+            for (String line : lines) {
+                // Assuming words are separated by spaces
+                String[] words = line.split("\\s+"); // Escape the backslash for regex
+                for (String word : words) {
+                    wordArrayList.add(word); // Add word to the ArrayList
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            return null; // Return null on error
+        }
+
+        return wordArrayList;
+    }
+    
+    public static LinkedList<String> readFileToLinkedList(String fileName) {
+        LinkedList<String> wordLinkedList = new LinkedList<>();
+
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(fileName));
+            for (String line : lines) {
+                // Assuming words are separated by spaces
+                String[] words = line.split("\\s+"); // Escape the backslash for regex
+                for (String word : words) {
+                    wordLinkedList.add(word); // Add word to the linked list
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            return null; // Return null on error
+        }
+
+        return wordLinkedList;
+    }
+
+    private static List<String> generateRandomWords(List<String> wordList, int numWords) {
+        List<String> randomWords = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < numWords; i++) {
+            int randomIndex = random.nextInt(wordList.size()); // Generate random index within list bounds
+            randomWords.add(wordList.get(randomIndex));
+        }
+
+        return randomWords;
     }
 
     public static int binarySearch(String[] array, String target) {
@@ -216,7 +359,7 @@ public class SearchAlgorithmComparison {
         return -1; // Not found
     }
 
-    public static int binarySearchLinkedList(LinkedList<String> list, String target) {
+    public static int binarySearchLinkedList(List<String> list, String target) {
         int left = 0;
         int right = list.size() - 1;
 
