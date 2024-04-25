@@ -37,10 +37,10 @@ public class SequentialSearch {
 
         String[] wordsToSearch = generateRandomWords(wordArrayList, numWordsToSearch).toArray(new String[0]); // Convert list to array
 
-        System.out.println("Searching for these words:");
-        for (String word : wordsToSearch) {
-            System.out.print(word + " ");
-        }
+//        System.out.println("Searching for these words:");
+//        for (String word : wordsToSearch) {
+//            System.out.print(word + " ");
+//        }
 
         System.out.println("\n\nArrayList search results:");
         long atotal = 0;
@@ -121,7 +121,7 @@ public class SequentialSearch {
         
         
 
-        System.out.println("Enter word to search: ");
+        System.out.println("\nEnter word to search: ");
         String search = scanner.nextLine();
         
         long startTime = System.nanoTime();
@@ -226,4 +226,3 @@ public class SequentialSearch {
    
     
 }
-
