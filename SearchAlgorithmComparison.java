@@ -6,7 +6,7 @@ import java.util.*;
 public class SearchAlgorithmComparison {
 
     public static void main(String[] args) {
-    	String fileName = "C:/words.txt"; // Use forward slashes for portability (/ instead of \)
+        String fileName = "C:/words.txt"; // Use forward slashes for portability (/ instead of \)
         List<String> wordArrayList = readFileToArrayList(fileName);
         List<String> wordLinkedList = readFileToLinkedList(fileName);
 
@@ -113,8 +113,6 @@ public class SearchAlgorithmComparison {
         } else {
             System.out.println("Word not found using Hashing Search with 500,000 hash table capacity");
         }
-        
-
 
         Scanner sc = new Scanner(System.in);
         System.out.println("\n\n\nEnter the number of words to search (max: " + wordArrayList.size() + "):");
@@ -204,6 +202,42 @@ public class SearchAlgorithmComparison {
         System.out.println("Total time used to search all words: " + total);
         System.out.println("Average time used to search all words: " + total/numWordsToSearch);
         
+        // Random hash search
+        System.out.println("\nHash search result:");
+
+        long totalNanoTime1 = 0;
+        long totalNanoTime2 = 0;
+
+        Set<String> selectedWords = new HashSet<>(); // Track selected words
+
+        Random random = new Random();
+
+        for (int i = 0; i < numWordsToSearch; i++) {
+
+            do {
+                searchWord = wordArrayList.get(random.nextInt(wordArrayList.size())); // Randomly select from wordArrayList
+            } while (selectedWords.contains(searchWord)); // Check if already selected
+            selectedWords.add(searchWord); // Add to selected words
+
+            long start1 = System.nanoTime();
+            Integer foundIndex1 = wordMap50000.get(searchWord);
+            long end1 = System.nanoTime();
+            totalNanoTime1 += (end1 - start1);
+
+            long start2 = System.nanoTime();
+            Integer foundIndex2 = wordMap500000.get(searchWord);
+            long end2 = System.nanoTime();
+            totalNanoTime2 += (end2 - start2);
+        }
+
+        double averageNanoTime1 = (double) totalNanoTime1 / numWordsToSearch;
+        double averageNanoTime2 = (double) totalNanoTime2 / numWordsToSearch;
+
+        System.out.println("Total time used to search all words for 50000 hash table: " + totalNanoTime1 + " nanoseconds");
+        System.out.println("Average time used to search all words for 50000 hash table: " + averageNanoTime1 + " nanoseconds");
+
+        System.out.println("\nTotal time used to search all words for 500000 hash table: " + totalNanoTime2 + " nanoseconds");
+        System.out.println("Average time used to search all words for 500000 hash table: " + averageNanoTime2 + " nanoseconds");
     }
 
     public static List<String> readFileToList(String fileName) {
