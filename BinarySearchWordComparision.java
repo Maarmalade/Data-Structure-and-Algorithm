@@ -3,7 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class BinarySearchWordComparision {
+public class BinarySearchRandom {
 
     public static void main(String[] args) {
         String fileName = "C:/words.txt";
