@@ -5,53 +5,41 @@ import java.util.*;
 
 public class BinarySearchWordComparision {
 
-	public static void main(String[] args) {
-	    String fileName = "C:/words.txt"; // Use forward slashes for portability
+    public static void main(String[] args) {
+        String fileName = "C:/words.txt";
 
-	    List<String> wordList = readFileToList(fileName);
-	    if (wordList == null) {
-	        System.err.println("Error reading file.");
-	        return;
-	    }
+        List<String> wordList = readFileToList(fileName);
+        if (wordList == null) {
+            System.err.println("Error reading file.");
+            return;
+        }
 
-	    Scanner scanner = new Scanner(System.in);
-	    System.out.println("Enter the number of words to search (max: " + wordList.size() + "):");
-	    int numWordsToSearch;
-	    try {
-	        numWordsToSearch = Integer.parseInt(scanner.nextLine());
-	        if (numWordsToSearch > wordList.size()) {
-	            throw new IllegalArgumentException("Number of random words cannot exceed list size.");
-	        }
-	    } catch (NumberFormatException e) {
-	        System.err.println("Invalid input. Please enter a number.");
-	        return;
-	    } catch (IllegalArgumentException e) {
-	        System.err.println(e.getMessage());
-	        return;
-	    }
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the number of random words to perform binary search (max: " + wordList.size() + "):");
+        int numWordsToSearch;
+        try {
+            numWordsToSearch = Integer.parseInt(scanner.nextLine());
+            if (numWordsToSearch > wordList.size()) {
+                throw new IllegalArgumentException("Number of random words cannot exceed list size.");
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid input. Please enter a number.");
+            return;
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
 
-	    // Generate random words only once
-	    List<String> wordsToSearch = generateRandomWords(wordList, numWordsToSearch);
+        List<String> wordsToSearch = generateRandomWords(wordList, numWordsToSearch);
 
-	    System.out.println("Searching for these words:");
-	    for (String word : wordsToSearch) {
-	        System.out.println(word);
-	    }
+        long binaryArrayTime = performBinaryArraySearch(wordList, wordsToSearch);
+        long modifiedBinaryArrayTime = performModifiedBinaryArraySearch(wordList, wordsToSearch);
+        long linkedListTime = performLinkedListSearch(wordList, wordsToSearch);
 
-	    // Perform searches
-	    System.out.println("\nSearch results:");
-
-	    // Perform binary search in array
-	    System.out.println("Binary ArrayList Search");
-	    long binaryArrayTime = performBinaryArraySearch(wordList, wordsToSearch);
-
-	    // Perform modified binary search in array
-	    System.out.println("Modified Binary ArrayList Search");
-	    long modifiedBinaryArrayTime = performModifiedBinaryArraySearch(wordList, wordsToSearch);
-
-	    System.out.println("\nTime taken for Binary ArrayList Search: " + binaryArrayTime + " nanoseconds");
-	    System.out.println("Time taken for Modified Binary ArrayList Search: " + modifiedBinaryArrayTime + " nanoseconds");
-	}
+        System.out.println("\nTime taken for Binary ArrayList Search: " + binaryArrayTime + " nanoseconds");
+        System.out.println("Time taken for Modified Binary ArrayList Search: " + modifiedBinaryArrayTime + " nanoseconds");
+        System.out.println("Time taken for Linked List Search: " + linkedListTime + " nanoseconds");
+    }
 
     private static List<String> readFileToList(String fileName) {
         try {
@@ -90,18 +78,18 @@ public class BinarySearchWordComparision {
 
             long endTime = System.nanoTime();
             long nanos = endTime - startTime;
-            
+
             if (index != -1) {
-                System.out.println("Word '" + word + "' found in array at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
+             //   System.out.println("Word '" + word + "' found in array at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
             } else {
-                System.out.println("Word '" + word + "' not found in array (binary)");
+            //    System.out.println("Word '" + word + "' not found in array (binary)");
             }
             totalTime += nanos;
         }
 
         return totalTime;
     }
-    
+
     private static long performModifiedBinaryArraySearch(List<String> wordList, List<String> wordsToSearch) {
         long totalTime = 0;
         String[] wordArray = null;
@@ -120,9 +108,9 @@ public class BinarySearchWordComparision {
             long nanos = endTime - startTime;
 
             if (index != -1) {
-                System.out.println("Word '" + word + "' found in array at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
+             //   System.out.println("Word '" + word + "' found in modified array at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
             } else {
-                System.out.println("Word '" + word + "' not found in array (modified binary)");
+             //   System.out.println("Word '" + word + "' not found in modified array (modified binary)");
             }
             totalTime += nanos;
         }
@@ -130,6 +118,28 @@ public class BinarySearchWordComparision {
         return totalTime;
     }
 
+    private static long performLinkedListSearch(List<String> wordList, List<String> wordsToSearch) {
+        long totalTime = 0;
+        LinkedList<String> linkedList = new LinkedList<>(wordList);
+
+        for (String word : wordsToSearch) {
+            long startTime = System.nanoTime();
+
+            int index = binarySearchLinkedList(linkedList, word.toLowerCase());
+
+            long endTime = System.nanoTime();
+            long nanos = endTime - startTime;
+
+            if (index != -1) {
+             //   System.out.println("Word '" + word + "' found in linked list at index: " + index + " (Time taken: " + nanos + " nanoseconds)");
+            } else {
+             //   System.out.println("Word '" + word + "' not found in linked list");
+            }
+            totalTime += nanos;
+        }
+
+        return totalTime;
+    }
 
     private static int binarySearch(String[] array, String target) {
         int left = 0;
@@ -175,6 +185,28 @@ public class BinarySearchWordComparision {
                 } else {
                     left = mid + 1;
                 }
+            }
+        }
+
+        return -1; // Not found
+    }
+
+    private static int binarySearchLinkedList(LinkedList<String> list, String target) {
+        int left = 0;
+        int right = list.size() - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            String midElement = list.get(mid);
+
+            int comparisonResult = target.compareTo(midElement);
+
+            if (comparisonResult == 0) {
+                return mid;
+            } else if (comparisonResult < 0) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
             }
         }
 
