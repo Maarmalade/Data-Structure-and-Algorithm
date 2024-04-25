@@ -43,6 +43,12 @@ public class SearchAlgorithmComparison {
         long endModifiedSequentialLinkedList = System.nanoTime();
         long nanosModifiedSequentialLinkedList = endModifiedSequentialLinkedList - startModifiedSequentialLinkedList;
 
+        // Binary Search with LinkedList
+        long startBinaryLinkedList = System.nanoTime();
+        int indexBinaryLinkedList = binarySearchLinkedList(wordLinkedList, searchWord);
+        long endBinaryLinkedList = System.nanoTime();
+        long nanosBinaryLinkedList = endBinaryLinkedList - startBinaryLinkedList;
+
         // Hashing Search with 50,000 elements
         HashMap<String, Integer> wordMap50000 = createWordHashMap(wordList, 50000);
         long startHashing50000 = System.nanoTime();
@@ -58,15 +64,13 @@ public class SearchAlgorithmComparison {
         long nanosHashing500000 = endHashing500000 - startHashing500000;
 
         // Print results
-        
         System.out.println("Sequential ArrayList Search - Time taken: " + nanosSequentialArrayList + " nanoseconds");
         System.out.println("Modified Sequential LinkedList Search - Time taken: " + nanosModifiedSequentialLinkedList + " nanoseconds");
-        System.out.println("Binary Search - Time taken: " + nanosBinary + " nanoseconds");
+        System.out.println("Binary Array Search - Time taken: " + nanosBinary + " nanoseconds");
         System.out.println("Modified Binary Search - Time taken: " + nanosModifiedBinary + " nanoseconds");
+        System.out.println("Binary Search with LinkedList - Time taken: " + nanosBinaryLinkedList + " nanoseconds");
         System.out.println("Hashing Search with 50,000 elements - Time taken: " + nanosHashing50000 + " nanoseconds");
         System.out.println("Hashing Search with 500,000 elements - Time taken: " + nanosHashing500000 + " nanoseconds");
-
-      
 
         if (indexSequentialArrayList != -1) {
             System.out.println("Word found at index using Sequential ArrayList Search: " + indexSequentialArrayList);
@@ -79,7 +83,7 @@ public class SearchAlgorithmComparison {
         } else {
             System.out.println("Word not found using Modified Sequential LinkedList Search");
         }
-        
+
         if (indexBinary != -1) {
             System.out.println("Word found at index using Binary Search: " + indexBinary);
         } else {
@@ -91,7 +95,13 @@ public class SearchAlgorithmComparison {
         } else {
             System.out.println("Word not found using Modified Binary Search");
         }
-        
+
+        if (indexBinaryLinkedList != -1) {
+            System.out.println("Word found at index using Binary Search with LinkedList: " + indexBinaryLinkedList);
+        } else {
+            System.out.println("Word not found using Binary Search with LinkedList");
+        }
+
         if (indexHashing50000 != null) {
             System.out.println("Word found at index using Hashing Search with 50,000 hash table capacity: " + indexHashing50000);
         } else {
@@ -200,6 +210,28 @@ public class SearchAlgorithmComparison {
             String word = iterator.next();
             if (word.toLowerCase().equals(target)) {
                 return iterator.previousIndex();
+            }
+        }
+
+        return -1; // Not found
+    }
+
+    public static int binarySearchLinkedList(LinkedList<String> list, String target) {
+        int left = 0;
+        int right = list.size() - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            String midElement = list.get(mid);
+
+            int comparisonResult = target.compareTo(midElement);
+
+            if (comparisonResult == 0) {
+                return mid;
+            } else if (comparisonResult < 0) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
             }
         }
 
